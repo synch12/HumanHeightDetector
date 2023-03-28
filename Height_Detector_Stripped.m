@@ -1,13 +1,14 @@
 
 
 
-camSettings = CS_Kinect();
+camSettings = CS_KinectV2();
 camSettings.Init();
 
 
 %% 
 detector = DT_GMM();
-background = getAverage(camera_depth,10,0.1);
+detector.Init(camSettings)
+background = detector.Update();
 col_img = getsnapshot(camera_BGR);
 
 %%
