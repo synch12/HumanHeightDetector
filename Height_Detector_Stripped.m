@@ -32,7 +32,7 @@ set(camera_BGR,'FramesPerTrigger',1)
 set(camera_BGR,'TriggerFrameDelay',5)
 
 
-[disp_col, disp_dis] = convDisplay(background,col_img,21);
+[disp_col, disp_dis] = F_ConvDisplay(background,col_img,21);
 
 figure(1),clf;
 displayImCol = imshow(disp_col);
@@ -72,11 +72,12 @@ while(ishandle(running))
 	
 	framePtGenDis = uint16(frame);
 	framePtCloud = pcfromkinect(camera_depth, framePtGenDis);
-	[heights,detframe] = detectMeasure(frame,background,framePtCloud,cam_elevation,cam_height);
+    Update()
+	[heights,detframe] = F_HeightMeasure(frame,,framePtCloud,cam_elevation,cam_height);
 	disp(heights)
 	
 	%upscales the iamge, use 21, most others dont work
-	[disp_col, disp_dis] = convDisplay(frame,frameCol,21,detframe);
+	[disp_col, disp_dis] = F_ConvDisplay(frame,frameCol,21,detframe);
 	
 	%Magnitude scale of the resizing
 	mag = max(size(disp_col,[1 2])./size(frame));

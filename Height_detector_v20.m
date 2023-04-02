@@ -42,14 +42,14 @@ set(camera_depth,'Timeout',10)
 
 
 %% 
-background = getAverage(camera_depth,10,0.1);
+background = F_GetAverage(camera_depth,10,0.1);
 col_img = getsnapshot(camera_BGR);
 
 %%
 backgroundPtGen = uint16(background);
 backgroundPtCloud = pcfromkinect(camera_depth, backgroundPtGen);
 
-[cam_height, cam_elevation] = floorDetectMeasure(background,backgroundPtCloud);
+[cam_height, cam_elevation] = F_FloorDetectMeasure(background,backgroundPtCloud);
 
 
 %% setup camera and images
@@ -66,7 +66,7 @@ set(camera_BGR,'FramesPerTrigger',1)
 set(camera_BGR,'TriggerFrameDelay',5)
 
 
-[disp_col, disp_dis] = convDisplay(background,col_img,21);
+[disp_col, disp_dis] = F_ConvDisplay(background,col_img,21);
 
 figure(1),clf;
 displayImCol = imshow(disp_col);
@@ -113,11 +113,11 @@ while(1)
 	
 	framePtGenDis = uint16(frame);
 	framePtCloud = pcfromkinect(camera_depth, framePtGenDis);
-	[heights,detframe] = detectMeasure(frame,background,framePtCloud,cam_elevation,cam_height);
+	[heights,detframe] = F_DetectMeasure(frame,background,framePtCloud,cam_elevation,cam_height);
 	disp(heights)
 	
 	%upscales the iamge, use 21, most others dont work
-	[disp_col, disp_dis] = convDisplay(frame,frameCol,21,detframe);
+	[disp_col, disp_dis] = F_ConvDisplay(frame,frameCol,21,detframe);
 	
 	%Magnitude scale of the resizing
 	mag = max(size(disp_col,[1 2])./size(frame));
