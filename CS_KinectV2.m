@@ -19,6 +19,7 @@ function [camera_depth,camera_BGR] = Init_Kinect()
         set(camera_depth,'Timeout',10)
 end
 %TODO step(vidobj)
-function [RangeFrame, ColourFrame] = getFrame_Kinect()
-    
+function [RangeFrame, ColourFrame] = getFrame_Kinect(obj)
+    ColourFrame = [0,0,0];
+    RangeFrame = [0,0];
 end

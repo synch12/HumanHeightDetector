@@ -1,4 +1,4 @@
-classdef CameraSettings
+classdef CameraSettings < handle
     %CAMERASETTINGS Object to hold all camera settings
     %   Detailed explanation goes here
 
@@ -16,7 +16,7 @@ classdef CameraSettings
         XpxPrad;
         YpxPrad;
         initialise;
-        getFrame;
+        FrameMethod;
         depthSource;
         colourSource;
     end
@@ -31,7 +31,7 @@ classdef CameraSettings
             obj.dim_y = DIM_Y;
             obj.UpdatePixelAngles();
             obj.initialise = INIT;
-            obj.getFrame = GETFRAME;
+            obj.FrameMethod = GETFRAME;
         end
 
         function obj = UpdatePixelAngles(obj)
@@ -44,9 +44,11 @@ classdef CameraSettings
             obj.XpxPrad = 1/obj.XradPpx;
             obj.YpxPrad = 1/obj.YradPpx;
         end
-        
+        function [RangeFrame, ColourFrame] = getFrame(obj)
+            [RangeFrame, ColourFrame] = obj.FrameMethod();
+        end
         function obj = Init(obj)
-            obj.initialise();
+            [obj.depthSource, obj.colourSource] = obj.initialise();     
         end
     end
 end

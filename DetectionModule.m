@@ -1,11 +1,11 @@
-classdef DetectionModule
+classdef DetectionModule < handle
     %DETECTIONMODULE Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
 
         initialise;
-        Update;
+        UpdateMethod;
         detector;
         camera;
         blob;
@@ -16,11 +16,15 @@ classdef DetectionModule
             %DETECTIONMODULE Construct an instance of this class
             %   Detailed explanation goes here
             obj.initialise = init;
-            obj.Update = update;
+            obj.UpdateMethod = update;
         end
         
-        function Init(Camera)
-            obj.initialise(obj,Camera);
+        function [RangeFrame, ColourFrame] = Update(obj)
+            [RangeFrame, ColourFrame] = obj.UpdateMethod(obj);
+        end
+        
+        function obj = Init(obj, Camera)
+            obj = obj.initialise(obj,Camera);
         end
     end
 end

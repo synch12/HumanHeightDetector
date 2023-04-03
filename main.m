@@ -3,8 +3,10 @@ function [done] = main(CamSettings, DtMethod)
 
 %   Init
 
-    camera = CamSettings.Init();
-    Detector.Init(camera)
+    camera = CamSettings;
+    detector = DtMethod;
+    camera.Init
+    detector.Init(camera)
 
 %   Main Loop
 
