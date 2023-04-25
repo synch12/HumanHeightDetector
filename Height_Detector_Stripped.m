@@ -1,7 +1,6 @@
 
 
 
-
 camSettings = CS_KinectV2_Snapshot();
 detector = DT_GMM();
 
@@ -15,7 +14,7 @@ detector.Init(camSettings)
 backgroundPtGen = uint16(background);
 backgroundPtCloud = pcfromkinect(camera_depth, backgroundPtGen);
 
-[cam_height, cam_elevation] = floorDetectMeasure(background,backgroundPtCloud);
+[cam_height, cam_elevation] = F_FloorDetectMeasure(background,backgroundPtCloud);
 
 
 %% setup camera and images
@@ -72,8 +71,8 @@ while(ishandle(running))
 	
 	framePtGenDis = uint16(frame);
 	framePtCloud = pcfromkinect(camera_depth, framePtGenDis);
-    Update()
-	[heights,detframe] = F_HeightMeasure(frame,,framePtCloud,cam_elevation,cam_height);
+    %detector.Update()
+	[heights,detframe] =F_DetectMeasure(frame,background,framePtCloud,cam_elevation,cam_height);
 	disp(heights)
 	
 	%upscales the iamge, use 21, most others dont work

@@ -16,7 +16,7 @@ classdef CameraSettings < handle
         XpxPrad;
         YpxPrad;
         initialise;
-        getFrame;
+        FrameMethod;
         depthSource;
         colourSource;
     end
@@ -31,7 +31,7 @@ classdef CameraSettings < handle
             obj.dim_y = DIM_Y;
             obj.UpdatePixelAngles();
             obj.initialise = INIT;
-            obj.getFrame = GETFRAME;
+            obj.FrameMethod = GETFRAME;
         end
 
         function obj = UpdatePixelAngles(obj)
@@ -44,7 +44,9 @@ classdef CameraSettings < handle
             obj.XpxPrad = 1/obj.XradPpx;
             obj.YpxPrad = 1/obj.YradPpx;
         end
-        
+        function [RangeFrame, ColourFrame] = getFrame(obj)
+            [RangeFrame, ColourFrame] = obj.FrameMethod();
+        end
         function obj = Init(obj)
             obj.initialise(obj);
         end
