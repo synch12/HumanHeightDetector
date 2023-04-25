@@ -1,4 +1,4 @@
-classdef CameraSettings
+classdef CameraSettings < handle
     %CAMERASETTINGS Object to hold all camera settings
     %   Detailed explanation goes here
 
@@ -46,7 +46,7 @@ classdef CameraSettings
         end
         
         function obj = Init(obj)
-            obj.initialise();
+            obj.initialise(obj);
         end
     end
 end

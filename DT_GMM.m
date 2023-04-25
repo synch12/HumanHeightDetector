@@ -11,7 +11,8 @@ function success = Init_GMM(obj,Camera)
 
 end
 
-function [RangeFrame, ColourFrame,mask] = Update_GMM(obj)
-    [RangeFrame, ColourFrame] = obj.camera.getFrame();
-    mask = obj.detector(RangeFrame);
+function [RangeFrame, ColourFrame, Mask, PointCloud] = Update_GMM(obj)
+    [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
+    Mask = obj.detector(RangeFrame);
+    
 end

@@ -1,4 +1,4 @@
-classdef DetectionModule
+classdef DetectionModule < handle
     %DETECTIONMODULE Summary of this class goes here
     %   Detailed explanation goes here
     

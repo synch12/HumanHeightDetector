@@ -1,18 +1,12 @@
 %%Function intended to be used with the final version of the Height
 %%detector function. It returns the the heights of everything it detects,
 %%also passes back the binary frame of stuff it detected. 
-function [heights,detFrame] = F_DetectMeasure(frame,background,framePtCloud,camElevationAngle,camHeight)
+function [heights,depthFrame] = F_DetectMeasure(frame,background,framePtCloud,camElevationAngle,camHeight)
 
-if(exist('camHeight', 'var') == 0)
-	camHeight = 0;
-end
-if(exist('camElevationAngle', 'var') == 0)
-	camElevationAngle = 0;
-end
+[dim_y,dim_x] = size(frame);
+depthFrame = int32(zeros(dim_y,dim_x));
 
-[dim_y,dim_x] = (size(frame));
 
-detFrame = int32(zeros(dim_y,dim_x));
 %% get the difference from average
 %load in the original unedited frame
 diff = abs(frame-background);
@@ -20,8 +14,6 @@ diff = abs(frame-background);
 diff_bw = diff > 100;
 diff_bw = bwareaopen(diff_bw,50);
 
-%frame_diff = zero_arr;
-%frame_diff(diff_bw==1) = frame(diff_bw==1);
 frame_diff = frame.*int32(diff_bw);
 
 %% Isolate the people-sized objects
@@ -72,7 +64,7 @@ for grp = 1:num_groups
 	%if the real area is big enough, then calculate height of 'person'
 	if(real_area(grp)>10000)
 		[y_indA,~] = find(person_dist);
-		detFrame = detFrame + person_dist;
+		depthFrame = depthFrame + person_dist;
 		loc_y = min(y_indA);
 		[~, x_indB] = find(person_dist(loc_y,:));
 		
@@ -113,8 +105,3 @@ end
 %Trim off all rows that have one or more NaN value. 
 heights = rmmissing(heights);
 heights = rmmissing(heights);
-
-
-
-
-

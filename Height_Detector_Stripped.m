@@ -1,15 +1,15 @@
 
 
 
-camSettings = CS_KinectV2();
-camSettings.Init();
+
+camSettings = CS_KinectV2_Snapshot();
+detector = DT_GMM();
 
 
 %% 
-detector = DT_GMM();
+camSettings.Init();
 detector.Init(camSettings)
-background = detector.Update();
-col_img = getsnapshot(camera_BGR);
+[background, col_img , point_cloud] = detector.Update();
 
 %%
 backgroundPtGen = uint16(background);
