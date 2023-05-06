@@ -123,7 +123,7 @@ while(1)
 	mag = max(size(disp_col,[1 2])./size(frame));
 	
 	%This prints on the text numbers for the height values.
-	if(   )
+	if(~isempty(heights))
 		for per = 1:1:size(heights,1)
 			text = sprintf('%0.2f',round(heights(per,1),2));
 			x = heights(per,2)*mag;

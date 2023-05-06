@@ -19,8 +19,8 @@ classdef DetectionModule < handle
             obj.UpdateMethod = update;
         end
         
-        function [RangeFrame, ColourFrame] = Update(obj)
-            [RangeFrame, ColourFrame] = obj.UpdateMethod(obj);
+        function [RangeFrame, ColourFrame, Mask, PointCloud] = Update(obj)
+            [RangeFrame, ColourFrame, Mask, PointCloud] = obj.UpdateMethod(obj);
         end
         
         function obj = Init(obj, Camera)

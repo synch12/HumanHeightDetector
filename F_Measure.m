@@ -1,7 +1,18 @@
 %%Function intended to be used with the final version of the Height
 %%detector function. It returns the the heights of everything it detects,
 %%also passes back the binary frame of stuff it detected. 
-function [heights,depthFrame] = F_DetectMeasure(frame,mask,framePtCloud,camElevationAngle,camHeight)
+
+%function [heights,depthFrame] = F_Measure(frame,mask,framePtCloud,camElevationAngle,camHeight)
+
+
+%Test inputs
+frame = ;
+mask = ;
+framePtCloud = ;
+camElevationAngle = ;
+camHeight = ;
+
+%
 
 [dim_y,dim_x] = size(frame);
 depthFrame = int32(zeros(dim_y,dim_x));

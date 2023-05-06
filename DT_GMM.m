@@ -5,13 +5,13 @@ GMM = DetectionModule(@Init_GMM, @Update_GMM);
 end
 
 function obj = Init_GMM(obj,Camera)
-    obj.detector = vision.ForegroundDetector('NumTrainingFrames', 5, 'InitialVariance', 30*30);
+    obj.detector = vision.ForegroundDetector('NumTrainingFrames', 60, 'InitialVariance', 30*5,'MinimumBackgroundRatio', 0.5);
     obj.camera = Camera;
 
 end
 
 function [RangeFrame, ColourFrame, Mask, PointCloud] = Update_GMM(obj)
     [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
-    Mask = obj.detector(RangeFrame);
+    Mask = obj.detector(uint8(bitshift(RangeFrame,-8)));
     
 end

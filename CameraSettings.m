@@ -17,12 +17,13 @@ classdef CameraSettings < handle
         YpxPrad;
         initialise;
         FrameMethod;
+        StopMethod;
         depthSource;
         colourSource;
     end
     
     methods
-        function obj = CameraSettings(FOV_X, FOV_Y, DIM_X, DIM_Y,INIT,GETFRAME)
+        function obj = CameraSettings(FOV_X, FOV_Y, DIM_X, DIM_Y,INIT,GETFRAME,STOP)
             %CAMERASETTINGS Construct an instance of this class
             %   Detailed explanation goes here
             obj.xFOV = FOV_X;
@@ -32,6 +33,7 @@ classdef CameraSettings < handle
             obj.UpdatePixelAngles();
             obj.initialise = INIT;
             obj.FrameMethod = GETFRAME;
+            obj.StopMethod = STOP;
         end
 
         function obj = UpdatePixelAngles(obj)
@@ -44,11 +46,14 @@ classdef CameraSettings < handle
             obj.XpxPrad = 1/obj.XradPpx;
             obj.YpxPrad = 1/obj.YradPpx;
         end
-        function [RangeFrame, ColourFrame] = getFrame(obj)
-            [RangeFrame, ColourFrame] = obj.FrameMethod();
+        function [RangeFrame, ColourFrame, PointCloud] = getFrame(obj)
+            [RangeFrame, ColourFrame, PointCloud] = obj.FrameMethod(obj);
         end
         function obj = Init(obj)
             obj.initialise(obj);
+        end
+        function obj = Stop(obj)
+            obj.StopMethod(obj);
         end
     end
 end
