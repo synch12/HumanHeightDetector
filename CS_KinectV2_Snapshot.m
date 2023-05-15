@@ -5,7 +5,7 @@ CAM_FOV_X = 70.6;
 CAM_FOV_Y = 60;
 CAM_DIM_X = 512;
 CAM_DIM_Y = 424;
-CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y, @Init_Kinect, @getFrame_Kinect,@STOP);
+CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START);
 end
 
 function [camera_depth,camera_BGR] = Init_Kinect(obj)
@@ -31,8 +31,13 @@ function [camera_depth,camera_BGR] = Init_Kinect(obj)
         set(obj.colourSource,'TriggerRepeat',Inf)
         set(obj.colourSource,'FramesPerTrigger',30)
         set(obj.colourSource,'TriggerFrameDelay',5)
+end
 
-
+function START(obj)
+        triggerconfig(obj.depthSource,'immediate')
+        set(obj.depthSource,'TriggerRepeat',Inf)
+        triggerconfig(obj.colourSource,'immediate')
+        set(obj.colourSource,'TriggerRepeat',Inf)
         start(obj.depthSource);
         start(obj.colourSource);
 end

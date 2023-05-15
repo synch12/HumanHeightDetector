@@ -11,26 +11,28 @@ Depth_videoPlayer = vision.VideoPlayer();
 RGB_videoPlayer = vision.VideoPlayer();
 %
 try
+    camera.Start();
     [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
     for i = 1:1:trainingFrames
         [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
     end
+    camera.Stop();
     [cam_height, cam_angle] = floorDetectMeasure(int32(frame_depth), frame_PtCloud);
-    
     disp('Press a key !' ) % Press a key here
     pause;
     RGB_videoPlayer(frame_rgb);
-
+    camera.Start();
 
     %   Main Loop
 
     while( isOpen(RGB_videoPlayer))
         %   obtain frame
         [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
+        mask_fg = F_ProcessMask(mask_fg, frame_depth);
         [alpha,frame_diff] = F_IsolatePeople(mask_fg,frame_depth);
         [heights,depthFrame] = F_MeasureHeights(int32(alpha),int32(frame_diff),int32(frame_depth),frame_PtCloud,cam_height, cam_angle);
         heights
-       
+        
         mag = max(size(frame_rgb,[1 2])./size(frame_diff));
         if(~isempty(heights))
 		    for per = 1:1:size(heights,1)
@@ -51,7 +53,7 @@ try
         size(frame_diff)
         %   Display captures 
         videoPlayer(frame_diff);
-        Depth_videoPlayer(uint8(bitshift(frame_depth,-8)));
+        Depth_videoPlayer(mask_fg);
         RGB_videoPlayer(frame_rgb);
     end
 catch e
