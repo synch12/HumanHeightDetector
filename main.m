@@ -1,73 +1,36 @@
-function [done] = main(CamSettings, DtMethod,trainingFrames)
+function [done] = main(CamSettings, DtMethod,training_frames)
 %% Created 18/03/23 By Malachi Wihongi
-
-%   Init
+%   Initialise camera and detector
 camera = CamSettings;
-camera.Init();
 detector = DtMethod;
+camera.Init();
 detector.Init(camera);
-videoPlayer = vision.VideoPlayer();
-Depth_videoPlayer = vision.VideoPlayer();
-RGB_videoPlayer = vision.VideoPlayer();
-%
+
+%   Initialise video players
+video_player = vision.VideoPlayer();
+depth_video_player = vision.VideoPlayer();
+rgb_video_player = vision.VideoPlayer();
+
 try
-    camera.Start();
-    [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
-    for i = 1:1:trainingFrames
-        [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
-    end
-    camera.Stop();
-    [cam_height, cam_angle] = floorDetectMeasure(int32(frame_depth), frame_PtCloud);
-    disp('Press a key !' ) % Press a key here
-    pause;
-    RGB_videoPlayer(frame_rgb);
+    [frame_rgb, averaged_frame, point_cloud] = F_TrainBackgroundModel(camera, detector, training_frames);
+    [cam_height, cam_angle] = F_CalculateSetup(averaged_frame, point_cloud);
+    rgb_video_player(frame_rgb);
+    %   precalculate constants
+    mag = max(size(frame_rgb,[1 2])./size(averaged_frame));
     camera.Start();
 
     %   Main Loop
-
-    while( isOpen(RGB_videoPlayer))
-        %   obtain frame
+    while( isOpen(rgb_video_player))
         [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
-        mask_fg = F_ProcessMask(mask_fg, frame_depth);
-        [alpha,frame_diff] = F_IsolatePeople(mask_fg,frame_depth);
-        [heights,depthFrame] = F_MeasureHeights(int32(alpha),int32(frame_diff),int32(frame_depth),frame_PtCloud,cam_height, cam_angle);
-        heights
+        heights = F_DetectMeasure(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
+        [frame_rgb, frame_diff] = F_OverlayText(heights, mag, frame_rgb, uint16(mask_fg));
         
-        mag = max(size(frame_rgb,[1 2])./size(frame_diff));
-        if(~isempty(heights))
-		    for per = 1:1:size(heights,1)
-			    text = sprintf('%0.2f',round(heights(per,1),2));
-			    x = heights(per,2);%*mag;
-			    y = heights(per,3);%*mag - 20*mag;
-			    %Cap the y value to >1
-			    if(y <= 0)
-				    y = 1;
-			    end
-			    frame_rgb  = insertText(frame_rgb,[x,y],text,...
-				    'FontSize',24,'BoxOpacity',0.5,'BoxColor','black','TextColor','red');
-			    frame_diff  = insertText(frame_diff,[x,y],text,...
-				    'FontSize',24,'BoxOpacity',0,'TextColor','white');
-                frame_diff = frame_diff(:, :, 1);
-		    end
-        end
-        size(frame_diff)
-        %   Display captures 
-        videoPlayer(frame_diff);
-        Depth_videoPlayer(mask_fg);
-        RGB_videoPlayer(frame_rgb);
+        video_player(frame_diff);
+        depth_video_player(mask_fg);
+        rgb_video_player(frame_rgb);
     end
 catch e
     camera.Stop();
-
-rethrow(e)	
+    rethrow(e)	
 end
-
 camera.Stop()
-%wrapUp()
-
-
-
-
-
-% V0.1 Set up basic framework for system execution MW
-% V0.2 

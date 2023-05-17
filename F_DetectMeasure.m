@@ -3,15 +3,22 @@
 %%also passes back the binary frame of stuff it detected. 
 function [heights,depthFrame] = F_DetectMeasure(frame,mask,framePtCloud,camElevationAngle,camHeight)
 
+if(exist('camHeight', 'var') == 0)
+	camHeight = 0;
+end
+if(exist('camElevationAngle', 'var') == 0)
+	camElevationAngle = 0;
+end
+
 [dim_y,dim_x] = size(frame);
 depthFrame = int32(zeros(dim_y,dim_x));
 
 
 %% get the difference from average
 %load in the original unedited frame
-diff = abs(frame-mask);
+diff = mask;
 
-diff_bw = diff > 100;
+diff_bw = mask;
 diff_bw = bwareaopen(diff_bw,50);
 
 frame_diff = frame.*int32(diff_bw);
@@ -103,5 +110,5 @@ for grp = 1:num_groups
 end
 
 %Trim off all rows that have one or more NaN value. 
-heights = rmmissing(heights);
-heights = rmmissing(heights);
+nanRows = any(isnan(heights), 2);
+heights(nanRows,:) = [];
