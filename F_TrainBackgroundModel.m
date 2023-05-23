@@ -4,9 +4,9 @@ function [frame_rgb,averaged_frame, PointCloud] = F_TrainBackgroundModel(camera,
 
 Averaging_Frames = int32(zeros(camera.dim_y,camera.dim_x,trainingFrames));
 camera.Start();
-[frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
+[frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Train();
 for i = 1:1:trainingFrames
-    [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
+    [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Train();
     ave_frame = int32(frame_depth);
     Averaging_Frames(:,:,i) = ave_frame;
 end

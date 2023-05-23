@@ -20,7 +20,6 @@ diff = mask;
 
 diff_bw = mask;
 diff_bw = bwareaopen(diff_bw,50);
-
 frame_diff = frame.*int32(diff_bw);
 
 %% Isolate the people-sized objects

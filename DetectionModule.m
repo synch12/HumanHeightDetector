@@ -9,14 +9,16 @@ classdef DetectionModule < handle
         detector;
         camera;
         blob;
+        trainMethod;
     end
     
     methods
-        function obj = DetectionModule(init,update)
+        function obj = DetectionModule(init,update,train)
             %DETECTIONMODULE Construct an instance of this class
             %   Detailed explanation goes here
             obj.initialise = init;
             obj.UpdateMethod = update;
+            obj.trainMethod = train;
         end
         
         function [RangeFrame, ColourFrame, Mask, PointCloud] = Update(obj)
@@ -25,6 +27,9 @@ classdef DetectionModule < handle
         
         function obj = Init(obj, Camera)
             obj = obj.initialise(obj,Camera);
+        end
+        function [RangeFrame, ColourFrame, Mask, PointCloud] = Train(obj)
+            [RangeFrame, ColourFrame, Mask, PointCloud] = obj.trainMethod(obj);
         end
     end
 end

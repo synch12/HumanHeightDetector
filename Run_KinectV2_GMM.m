@@ -1,1 +1,1 @@
-main(CS_KinectV2_Snapshot(), DT_GMM(),30)
+main('GMM', 'v2',30)

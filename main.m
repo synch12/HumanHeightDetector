@@ -1,15 +1,14 @@
 function [done] = main(CamSettings, DtMethod,training_frames)
 %% Created 18/03/23 By Malachi Wihongi
 %   Initialise camera and detector
-camera = CamSettings;
-detector = DtMethod;
+[camera,detector] = F_ParseParameters(CamSettings, DtMethod);
 camera.Init();
 detector.Init(camera);
 
 %   Initialise video players
-video_player = vision.VideoPlayer();
+video_player = vision.VideoPlayer("Name","Mask Output");
 depth_video_player = vision.VideoPlayer();
-rgb_video_player = vision.VideoPlayer();
+rgb_video_player = vision.VideoPlayer("Name","Colour Feed");
 
 try
     [frame_rgb, averaged_frame, point_cloud] = F_TrainBackgroundModel(camera, detector, training_frames);
@@ -25,8 +24,8 @@ try
         heights = F_DetectMeasure(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
         [frame_rgb, frame_diff] = F_OverlayText(heights, mag, frame_rgb, uint16(mask_fg));
         
-        video_player(frame_diff);
-        depth_video_player(mask_fg);
+        video_player(mask_fg);
+        depth_video_player(uint8(bitshift(frame_depth,-8)));
         rgb_video_player(frame_rgb);
     end
 catch e
