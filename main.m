@@ -1,9 +1,9 @@
-function [done] = main(CamSettings, DtMethod,training_frames)
+function [done] = main(CamSettings, DetectionMethod,training_frames, parameters)
 %% Created 18/03/23 By Malachi Wihongi
 %   Initialise camera and detector
-[camera,detector] = F_ParseParameters(CamSettings, DtMethod);
+[camera,detector] = F_ParseParameters(CamSettings, DetectionMethod );
 camera.Init();
-detector.Init(camera);
+detector.Init(camera,parameters);
 
 %   Initialise video players
 video_player = vision.VideoPlayer("Name","Mask Output");
@@ -15,17 +15,18 @@ try
     [cam_height, cam_angle] = F_CalculateSetup(averaged_frame, point_cloud);
     rgb_video_player(frame_rgb);
     %   precalculate constants
-    mag = max(size(frame_rgb,[1 2])./size(averaged_frame));
+    [disp_col, disp_dis] = F_ConvDisplay(averaged_frame,frame_rgb,21,averaged_frame);
+    mag = max(size(disp_col,[1 2])./size(averaged_frame)); %   used to overlay text at the correct location
     camera.Start();
 
     %   Main Loop
     while( isOpen(rgb_video_player))
         [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
         heights = F_DetectMeasure(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
-        [frame_rgb, frame_diff] = F_OverlayText(heights, mag, frame_rgb, uint16(mask_fg));
-        
-        video_player(mask_fg);
-        depth_video_player(uint8(bitshift(frame_depth,-8)));
+        [disp_col, disp_dis] = F_ConvDisplay(mask_fg,frame_rgb,21,frame_depth);
+        [visual_display, frame_diff] = F_OverlayText(heights, mag, disp_col, disp_dis);
+        video_player(visual_display);
+        depth_video_player(disp_dis);
         rgb_video_player(frame_rgb);
     end
 catch e

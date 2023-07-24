@@ -10,6 +10,10 @@ classdef DetectionModule < handle
         camera;
         blob;
         trainMethod;
+        range_min
+        range_max
+        horizontal_cutoff_dividend
+        horizontal_cutoff
     end
     
     methods
@@ -25,8 +29,8 @@ classdef DetectionModule < handle
             [RangeFrame, ColourFrame, Mask, PointCloud] = obj.UpdateMethod(obj);
         end
         
-        function obj = Init(obj, Camera)
-            obj = obj.initialise(obj,Camera);
+        function obj = Init(obj, Camera, params)
+            obj = obj.initialise(obj,Camera, params);
         end
         function [RangeFrame, ColourFrame, Mask, PointCloud] = Train(obj)
             [RangeFrame, ColourFrame, Mask, PointCloud] = obj.trainMethod(obj);

@@ -5,7 +5,9 @@ CAM_FOV_X = 70.6;
 CAM_FOV_Y = 60;
 CAM_DIM_X = 512;
 CAM_DIM_Y = 424;
-CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START);
+CAM_FOCAL_X = 388.198;
+CAM_FOCAL_Y = 389.033;
+CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y,CAM_FOCAL_X,CAM_FOCAL_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START);
 end
 
 function [camera_depth,camera_BGR] = Init_Kinect(obj)
@@ -38,6 +40,7 @@ function START(obj)
         set(obj.depthSource,'TriggerRepeat',Inf)
         triggerconfig(obj.colourSource,'immediate')
         set(obj.colourSource,'TriggerRepeat',Inf)
+        obj.colourSource.Timeout = 15;
         start(obj.depthSource);
         start(obj.colourSource);
 end
@@ -51,6 +54,7 @@ function STOP(obj)
     set(obj.colourSource,'TriggerRepeat',0)
     stop(obj.depthSource);
     stop(obj.colourSource);
+    %print('Stopped!')
 end
 %TODO step(vidobj)
 function [RangeFrame, ColourFrame, PointCloud] = getFrame_Kinect(obj)

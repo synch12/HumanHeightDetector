@@ -4,7 +4,7 @@ function GMM = DT_GMM()
 GMM = DetectionModule(@Init_GMM, @Update_GMM,@Train_GMM);
 end
 
-function obj = Init_GMM(obj,Camera)
+function obj = Init_GMM(obj,Camera, ~)
     obj.detector = vision.ForegroundDetector('NumTrainingFrames', 60, 'InitialVariance', 30*5,'MinimumBackgroundRatio', 0.5);
     obj.camera = Camera;
 

@@ -1,28 +1,8 @@
 %%Function intended to be used with the final version of the Height
 %%detector function. It returns the the heights of everything it detects,
 %%also passes back the binary frame of stuff it detected. 
-function [heights,detFrame] = F_HeightMeasure(frame,background,framePtCloud,camElevationAngle,camHeight)
+function [heights,detFrame] = F_HeightMeasure(frame, framePtCloud,camElevationAngle,camHeight)
 
-
-% [dim_y,dim_x] = (size(frame));
-% 
-% detFrame = int32(zeros(dim_y,dim_x));
-% %% get the difference from average
-% %load in the original unedited frame
-% diff = abs(frame-background);
-% 
-% diff_bw = diff > 100;
-% diff_bw = bwareaopen(diff_bw,50);
-% 
-% %frame_diff = zero_arr;
-% %frame_diff(diff_bw==1) = frame(diff_bw==1);
-% frame_diff = frame.*int32(diff_bw);
-% 
-% %% Isolate the people-sized objects
-% 
-% frame_min = imerode(frame,strel('disk', 1));
-% %Edge is used to eliminate mixed pixel effect, may not be neeeded for kinect, does still seem to help a bit
-% edge_bw = ((frame-frame_min)./frame);
 
 alpha = frame_diff & not(edge_bw);
 alpha = bwareaopen(alpha,50);
