@@ -1,6 +1,6 @@
 %% Function to measure the floor provided a frame and its point cloud
 %If it returns NaN that means the method input is likely wrong
-function [camera_height,elevation_angle] = F_CalculateSetup(frame,framePtCloud,method,camera)
+function [camera_height,elevation_angle] = F_CalibrateFloor(frame,framePtCloud,method,camera)
 
 if(exist('method', 'var') == 0)
 	method = 'Area';

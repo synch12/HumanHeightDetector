@@ -21,9 +21,8 @@ try
     [floor_map, floor_mask,floor_cutoff] = f_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
     floor_variation = sum(floor_mask,"all")*45;
     floor_compare = uint16(floor_map .*  int32(floor_mask));
-    imshow(floor_mask)
-    assignin('base',"floor_map",floor_map);
-    %floor_map(:,5)
+
+
     %   Main Loop
     while( 1)
         [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
@@ -35,15 +34,15 @@ try
         depth_video_player(mask_fg);
         rgb_video_player(culled_frame);
         floor_delta = sum(abs(floor_compare - frame_depth .* uint16(floor_mask)),"all");
-        %disp(floor_delta)
-        %floor_variation
+
+
+
         if(floor_delta > floor_variation)
             disp("need to recalibrate floor")
-            [cam_height, cam_angle] = F_CalculateSetup(int32(frame_depth), frame_PtCloud,'',camera);
-            [floor_map, floor_mask,floor_cutoff] = f_map_floor_mask(cam_height,cam_angle,camera,int32(frame_depth));
+            [cam_height, cam_angle] = F_CalibrateFloor(int32(frame_depth), frame_PtCloud,'',camera);
+            [floor_map, floor_mask,floor_cutoff] = F_map_floor_mask(cam_height,cam_angle,camera,int32(frame_depth));
             
         end
-        assignin('base',"floor_cutoff",floor_cutoff);
     end
 catch e
     camera.Stop();
