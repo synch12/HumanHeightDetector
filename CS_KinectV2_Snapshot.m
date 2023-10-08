@@ -7,7 +7,7 @@ CAM_DIM_X = 512;
 CAM_DIM_Y = 424;
 CAM_FOCAL_X = 388.198;
 CAM_FOCAL_Y = 389.033;
-CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y,CAM_FOCAL_X,CAM_FOCAL_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START,@GetPointCloud_Kinect);
+CS_out = M_Camera(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y,CAM_FOCAL_X,CAM_FOCAL_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START,@GetPointCloud_Kinect);
 end
 
 function [camera_depth,camera_BGR] = Init_Kinect(obj)

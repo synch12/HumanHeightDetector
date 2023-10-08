@@ -1,4 +1,4 @@
-classdef DetectionModule < handle
+classdef M_Detector < handle
     %DETECTIONMODULE Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -17,7 +17,7 @@ classdef DetectionModule < handle
     end
     
     methods
-        function obj = DetectionModule(init,update,train)
+        function obj = M_Detector(init,update,train)
             %DETECTIONMODULE Construct an instance of this class
             %   Detailed explanation goes here
             obj.initialise = init;

@@ -1,7 +1,7 @@
 function CS_out = CS_Data_Stream()
 %CAMSETTINGS_KINECT Summary of this function goes here
 %   Detailed explanation goes here
-CS_out = CameraSettings(58,58,512,512,461.8,461.8, @Init_Test_Cam, @getFrame_Test_Cam,@START,@START);
+CS_out = M_Camera(58,58,512,512,461.8,461.8, @Init_Test_Cam, @getFrame_Test_Cam,@START,@START,@GetPointCloud);
 end
 
 function [camera_depth,camera_BGR] = Init_Test_Cam(obj)
@@ -33,4 +33,7 @@ end
 function START(obj)
     
 end
-
+function PointCloud = GetPointCloud(obj,RangeFrame)
+        frame_depth_abs = uint16(RangeFrame);
+        PointCloud = pcfromdepth(frame_depth_abs,1000,obj.Intrinsics);
+end

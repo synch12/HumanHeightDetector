@@ -1,4 +1,4 @@
-classdef CameraSettings < handle
+classdef M_Camera < handle
     %CAMERASETTINGS Object to hold all camera settings
     %   Detailed explanation goes here
 
@@ -29,7 +29,7 @@ classdef CameraSettings < handle
     end
     
     methods
-        function obj = CameraSettings(FOV_X, FOV_Y, DIM_X, DIM_Y,FOC_X,FOC_Y,INIT,GETFRAME,STOP,START,PCMETHOD)
+        function obj = M_Camera(FOV_X, FOV_Y, DIM_X, DIM_Y,FOC_X,FOC_Y,INIT,GETFRAME,STOP,START,PCMETHOD)
             %CAMERASETTINGS Construct an instance of this class
             %   Detailed explanation goes here
             obj.xFOV = FOV_X;
