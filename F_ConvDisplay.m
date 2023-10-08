@@ -1,8 +1,8 @@
 function [colour_out, depth_out] = F_ConvDisplay(frame_depth, frame_colour, mag_fact, det_frame)	
 %this is for resizing the depth and colour images and superimposing them
 %not for adding text
-if(exist('det_frame', 'var') == 0)
-	det_frame = zeros(size(frame_depth));
+if(isempty(det_frame))
+	det_frame = uint16(zeros(size(frame_depth)));
 end
 
 %% the aspect ratios of the different cameras

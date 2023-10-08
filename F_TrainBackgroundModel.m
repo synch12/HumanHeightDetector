@@ -5,9 +5,10 @@ disp(camera.dim_y);
 disp(camera.dim_x);
 Averaging_Frames = int32(zeros(camera.dim_y,camera.dim_x,trainingFrames));
 camera.Start();
-[frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
+[frame_depth, frame_rgb] = camera.GetFrame();
 for i = 1:1:trainingFrames
-    [frame_depth, frame_rgb, mask_fg, frame_PtCloud] = detector.Update();
+    [frame_depth, frame_rgb] = camera.GetFrame();
+    detector.Train(frame_depth, frame_rgb,0);
     ave_frame = int32(frame_depth);
     Averaging_Frames(:,:,i) = ave_frame;
 end

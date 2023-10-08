@@ -1,7 +1,7 @@
 function GMM = DT_GMM()
-%DT_GMM Gaussian Mixture Model foreground detector
+% DT_GMM Gaussian Mixture Model foreground detector
 %   Makes use of vision.ForegroundDetector from Computer Vision Toolbox
-GMM = DetectionModule(@Init_GMM, @Update_GMM,@Train_GMM);
+GMM = M_Detector(@Init_GMM, @Update_GMM,@Train_GMM);
 end
 
 function obj = Init_GMM(obj,Camera, ~)
@@ -10,7 +10,7 @@ function obj = Init_GMM(obj,Camera, ~)
 
 end
 
-function Mask = Update_GMM(obj, RangeFrame, ~,  ~)
+function Mask = Update_GMM(obj, RangeFrame, ~,  ~,~)
     Mask = obj.detector(uint8(bitshift(RangeFrame,-8)));
 end
 

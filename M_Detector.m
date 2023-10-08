@@ -1,19 +1,24 @@
 classdef M_Detector < handle
-    %DETECTIONMODULE Summary of this class goes here
+    %DETECTIONMODULE The framework for detection methods.
     %   Detailed explanation goes here
-    
+    %   
+    %   
     properties
-
         initialise;
         UpdateMethod;
         detector;
         camera;
         blob;
         trainMethod;
-        range_min
-        range_max
-        horizontal_cutoff_dividend
-        horizontal_cutoff
+        range_min;
+        range_max;
+        horizontal_cutoff_dividend;
+        horizontal_cutoff;
+        previous_frame;
+        average;
+        window_size;
+        threshold;
+        motion_threshold;
     end
     
     methods
@@ -25,8 +30,8 @@ classdef M_Detector < handle
             obj.trainMethod = train;
         end
         
-        function Mask = Update(obj, RangeFrame, ColourFrame,  PointCloud)
-            Mask = obj.UpdateMethod(obj, RangeFrame, ColourFrame,  PointCloud);
+        function Mask = Update(obj, RangeFrame, ColourFrame,  PointCloud,floor_cutoff)
+            Mask = obj.UpdateMethod(obj, RangeFrame, ColourFrame,  PointCloud,floor_cutoff);
         end
         
         function obj = Init(obj, Camera, params)

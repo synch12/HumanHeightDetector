@@ -1,28 +1,35 @@
 function ABL = DT_Adaptive_background_learning()
 %DT_Adaptive_background_learning Gaussian Mixture Model foreground detector
 %   Makes use of vision.ForegroundDetector from Computer Vision Toolbox
-ABL = DetectionModule(@Init_ABL, @Update_ABL,@Train_ABL);
+ABL = M_Detector(@Init_ABL, @Update_ABL,@Train_ABL);
 end
 
-function obj = Init_ABL(obj,Camera, ~)
+function obj = Init_ABL(obj,Camera, param)
     obj.camera = Camera;
-    obj.last_frame = 0;
-    obj.average = uint16(zeros(obj.camera.dim_y,obj.camera.dim_x));
-    obj.window_size = 20;
+    obj.previous_frame = 0;
+    obj.average = int32(zeros(obj.camera.dim_y,obj.camera.dim_x));
+    obj.window_size = param(1);
+    obj.previous_frame = obj.average;
+    obj.threshold = param(2);
+    obj.motion_threshold = param(3);
+
 end
 
-function Mask = Update_ABL(obj, RangeFrame, ~,~)
-    motion_mask = (RangeFrame - obj.last_frame) > 20;
-    weighted_average =  (RangeFrame.*uint16(~motion_mask) + obj.average.*uint16(motion_mask));
-    obj.average = obj.average + (weighted_average - obj.average)./obj.window_size;
-    Mask = abs(RangeFrame- obj.average )>50;
-    
+function Mask = Update_ABL(obj, RangeFrame, ~,~,~)
+    frame = int32(RangeFrame);
+    se = strel('disk',30);
+    sd = strel('disk',100);
+    motion = imerode(abs(frame - obj.previous_frame)> obj.motion_threshold,se);
+    motion_mask = imdilate(motion,sd);
+    weighted_average =  (frame.*int32((~motion_mask)) + ...
+        obj.average.*int32(motion_mask));
+    obj.average = obj.average + int32((weighted_average - obj.average))./obj.window_size;
+    Mask = abs(frame - obj.average )>obj.threshold;
+    obj.previous_frame = frame; 
 end
 
-function [RangeFrame, ColourFrame, Mask] = Train_ABL(obj)
-    [RangeFrame, ColourFrame] = obj.camera.getFrame();
-    obj.detector.Camera.PassImage(RangeFrame, ColourFrame)
+function Mask = Train_ABL(obj,RangeFrame, ~,~)
     tempframe = int32((obj.average == 0));
-    obj.average = obj.average + (tempframe .* RangeFrame);
-    Mask = abs(RangeFrame- obj.average )>50;
+    obj.average = obj.average + (tempframe .* int32(RangeFrame));
+    Mask = abs(int32(RangeFrame)- obj.average )>100;
 end

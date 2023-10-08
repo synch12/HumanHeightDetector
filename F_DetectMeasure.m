@@ -1,12 +1,9 @@
-%%Function intended to be used with the final version of the Height
-%%detector function. It returns the the heights of everything it detects,
-%%also passes back the binary frame of stuff it detected. 
 function [heights,depthFrame] = F_DetectMeasure(frame,mask,framePtCloud,camElevationAngle,camHeight)
 
-if(exist('camHeight', 'var') == 0)
+if(isempty(camHeight))
 	camHeight = 0;
 end
-if(exist('camElevationAngle', 'var') == 0)
+if(isempty(camElevationAngle))
 	camElevationAngle = 0;
 end
 
@@ -31,7 +28,7 @@ edge_bw = ((frame-frame_min)./frame);
 alpha = frame_diff & not(edge_bw);
 alpha = bwareaopen(alpha,50);
 
-groups = gpuArray(bwlabel(alpha));
+groups = bwlabel(alpha);
 
 num_groups = max(groups(:));
 
@@ -75,33 +72,31 @@ for grp = 1:num_groups
 		[~, x_indB] = find(person_dist(loc_y,:));
 		
 		loc_x = round(median(x_indB));
-		try
-		    p3 = select(framePtCloud,loc_y,dim_x-loc_x).Location;
-		    y3 = p3(2);
-		    z3 = p3(3);
 		
-		    camToPersonDist = (sqrt(y3^2+z3^2));
+		p3 = select(framePtCloud,loc_y,dim_x-loc_x).Location;
+		y3 = p3(2);
+		z3 = p3(3);
 		
-		    heightAngleDeviation = atan(y3/z3)*-1;
-		    totalAngleDeviation = (sin(camElevationAngle+heightAngleDeviation));
-		    heightFromCamLevel = camToPersonDist*totalAngleDeviation;
+		camToPersonDist = (sqrt(y3^2+z3^2));
 		
-		    heights(grp,1) = heightFromCamLevel + camHeight;
+		heightAngleDeviation = atan(y3/z3)*-1;
+		totalAngleDeviation = (sin(camElevationAngle+heightAngleDeviation));
+		heightFromCamLevel = camToPersonDist*totalAngleDeviation;
+		
+		heights(grp,1) = heightFromCamLevel + camHeight;
 		
 		%For debugging, prints the heights and angles of each detected person
 		% 						disp("grp: " + grp + " ,  height: " +  height(grp) + " p: " + p + " ,  L: " + L + " ,  thetaT: "...
 		% 			+ rad2deg(theta_t) + " thetaP:  " + rad2deg(theta_d) + " ,  y3: " + y3 + " ,  z3: " + z3)
 		
-		    heights(grp,2) = loc_x;
-		    heights(grp,3) = loc_y;
+		heights(grp,2) = loc_x;
+		heights(grp,3) = loc_y;
 		
 		%For debugging
 		%disp("grp: " + grp + " ,  height: " +  height(grp) + " , disp H: " + text)		
 		% 			text(rend_X(grp),rend_Y(grp)-.5,[num2str(height(grp),3),'m'], 'HorizontalAlignment','center','color',colors{2},...
 		%           'VerticalAlignment','baseline', 'fontunits','normalized', FontSize',font_size,'backgroundcolor',colors{3})
-        catch
-        end
-    
+		
 	else
 		%it it isnt high enough, set all to NaN
 		heights(grp,1) = NaN;
