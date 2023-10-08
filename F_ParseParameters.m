@@ -9,7 +9,7 @@ switch CamSettings
         camera = CS_KinectV2_Snapshot;
         disp('Using KinectV2')
     case {'avi', 'test'}
-        camera = CS_DatasetFeed_AVI;
+        camera = CS_Data_Stream;
     otherwise
         camera = CS_KinectV2_Snapshot;
         disp('Defaulting to KinectV2')
@@ -29,6 +29,9 @@ switch DtMethod
         params = 0;
     case {'thresh', 'threshold'}
         detector = DT_Threshold();
+        params = [1,3,3];
+    case {'skel', 'skeleton'}
+        detector = DT_Skeleton;
         params = [1,3,3];
     otherwise
         detector = DT_GMM();

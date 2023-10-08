@@ -10,14 +10,10 @@ function obj = Init_GMM(obj,Camera, ~)
 
 end
 
-function [RangeFrame, ColourFrame, Mask, PointCloud] = Update_GMM(obj)
-    [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
+function Mask = Update_GMM(obj, RangeFrame, ~,  ~)
     Mask = obj.detector(uint8(bitshift(RangeFrame,-8)));
-    
 end
 
-function [RangeFrame, ColourFrame, Mask, PointCloud] = Train_GMM(obj)
-    [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
+function Mask = Train_GMM(obj, RangeFrame, ~,  ~)
     Mask = obj.detector(uint8(bitshift(RangeFrame,-8)));
-    
 end

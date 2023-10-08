@@ -16,6 +16,7 @@ end
 
 function [RangeFrame, ColourFrame, Mask, PointCloud] = Update_Threshold(obj)
     [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
+
     Mask = (RangeFrame < obj.range_max) & (RangeFrame > obj.range_min);
     Mask(:,1:obj.horizontal_cutoff) = 0;
     Mask(:,obj.camera.dim_x-obj.horizontal_cutoff:obj.camera.dim_x) = 0;

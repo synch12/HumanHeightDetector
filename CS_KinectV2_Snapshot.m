@@ -7,7 +7,7 @@ CAM_DIM_X = 512;
 CAM_DIM_Y = 424;
 CAM_FOCAL_X = 388.198;
 CAM_FOCAL_Y = 389.033;
-CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y,CAM_FOCAL_X,CAM_FOCAL_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START);
+CS_out = CameraSettings(CAM_FOV_X,CAM_FOV_Y,CAM_DIM_X,CAM_DIM_Y,CAM_FOCAL_X,CAM_FOCAL_Y, @Init_Kinect, @getFrame_Kinect,@STOP, @START,@GetPointCloud_Kinect);
 end
 
 function [camera_depth,camera_BGR] = Init_Kinect(obj)
@@ -18,7 +18,7 @@ function [camera_depth,camera_BGR] = Init_Kinect(obj)
         src = getselectedsource(obj.depthSource);
         src.EnableBodyTracking = 'off';
         
-        set(obj.colourSource,'FramesPerTrigger',Inf);
+        set(obj.colourSource,'FramesPerTrigger',1);
         set(obj.colourSource,'TriggerRepeat',0);
         obj.colourSource.FrameGrabInterval = 1;
         
@@ -36,9 +36,9 @@ function [camera_depth,camera_BGR] = Init_Kinect(obj)
 end
 
 function START(obj)
-        triggerconfig(obj.depthSource,'immediate')
+        triggerconfig(obj.depthSource,'manual')
         set(obj.depthSource,'TriggerRepeat',Inf)
-        triggerconfig(obj.colourSource,'immediate')
+        triggerconfig(obj.colourSource,'manual')
         set(obj.colourSource,'TriggerRepeat',Inf)
         obj.colourSource.Timeout = 15;
         start(obj.depthSource);
@@ -54,14 +54,16 @@ function STOP(obj)
     set(obj.colourSource,'TriggerRepeat',0)
     stop(obj.depthSource);
     stop(obj.colourSource);
-    %print('Stopped!')
 end
 %TODO step(vidobj)
-function [RangeFrame, ColourFrame, PointCloud] = getFrame_Kinect(obj)
+function [RangeFrame, ColourFrame] = getFrame_Kinect(obj)
         RangeFrame = getsnapshot(obj.depthSource);
         ColourFrame = getsnapshot(obj.colourSource);
-        frame_depth_abs = uint16(RangeFrame);
-        PointCloud = pcfromkinect(obj.depthSource , frame_depth_abs);
         flushdata(obj.depthSource);
 	    flushdata(obj.colourSource);
+end
+
+function PointCloud = GetPointCloud_Kinect(obj,RangeFrame)
+        frame_depth_abs = uint16(RangeFrame);
+        PointCloud = pcfromkinect(obj.depthSource, frame_depth_abs);
 end

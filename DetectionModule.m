@@ -25,15 +25,15 @@ classdef DetectionModule < handle
             obj.trainMethod = train;
         end
         
-        function [RangeFrame, ColourFrame, Mask, PointCloud] = Update(obj)
-            [RangeFrame, ColourFrame, Mask, PointCloud] = obj.UpdateMethod(obj);
+        function Mask = Update(obj, RangeFrame, ColourFrame,  PointCloud)
+            Mask = obj.UpdateMethod(obj, RangeFrame, ColourFrame,  PointCloud);
         end
         
         function obj = Init(obj, Camera, params)
             obj = obj.initialise(obj,Camera, params);
         end
-        function [RangeFrame, ColourFrame, Mask, PointCloud] = Train(obj)
-            [RangeFrame, ColourFrame, Mask, PointCloud] = obj.trainMethod(obj);
+        function Mask = Train(obj,RangeFrame, ColourFrame, PointCloud)
+            Mask = obj.trainMethod(obj,RangeFrame, ColourFrame, PointCloud);
         end
     end
 end

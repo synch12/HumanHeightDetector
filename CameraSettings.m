@@ -3,6 +3,7 @@ classdef CameraSettings < handle
     %   Detailed explanation goes here
 
     properties
+        frame_count;
         xFOV;
         yFOV;
         dim_x;
@@ -23,10 +24,12 @@ classdef CameraSettings < handle
         depthSource;
         colourSource;
         StartMethod;
+        Intrinsics;
+        pcMethod;
     end
     
     methods
-        function obj = CameraSettings(FOV_X, FOV_Y, DIM_X, DIM_Y,FOC_X,FOC_Y,INIT,GETFRAME,STOP,START)
+        function obj = CameraSettings(FOV_X, FOV_Y, DIM_X, DIM_Y,FOC_X,FOC_Y,INIT,GETFRAME,STOP,START,PCMETHOD)
             %CAMERASETTINGS Construct an instance of this class
             %   Detailed explanation goes here
             obj.xFOV = FOV_X;
@@ -40,6 +43,8 @@ classdef CameraSettings < handle
             obj.FrameMethod = GETFRAME;
             obj.StopMethod = STOP;
             obj.StartMethod = START;
+            obj.Intrinsics = cameraIntrinsics([obj.fx, obj.fy],[DIM_X/2,DIM_Y/2],[DIM_X,DIM_Y]);
+            obj.pcMethod = PCMETHOD;
         end
 
         function obj = UpdatePixelAngles(obj)
@@ -52,8 +57,8 @@ classdef CameraSettings < handle
             obj.XpxPrad = 1/obj.XradPpx;
             obj.YpxPrad = 1/obj.YradPpx;
         end
-        function [RangeFrame, ColourFrame, PointCloud] = getFrame(obj)
-            [RangeFrame, ColourFrame, PointCloud] = obj.FrameMethod(obj);
+        function [RangeFrame, ColourFrame] = GetFrame(obj)
+            [RangeFrame, ColourFrame] = obj.FrameMethod(obj);
         end
         function obj = Init(obj)
             obj.initialise(obj);
@@ -63,6 +68,9 @@ classdef CameraSettings < handle
         end
         function obj = Start(obj)
             obj.StartMethod(obj);
+        end
+        function PointCloud = GeneratePointCloud(obj,RangeFrame)
+            PointCloud = obj.pcMethod(obj,RangeFrame);
         end
     end
 end
