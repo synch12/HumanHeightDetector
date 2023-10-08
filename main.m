@@ -14,50 +14,40 @@ stop = false;
 max_range = 10*Meters;
 cleanupObj = onCleanup(@cleanMeUp);
 createFigureWithButton()
+
+
 try
     [frame_rgb, averaged_frame, point_cloud] = F_TrainBackgroundModel(camera, detector, training_frames);
     [cam_height, cam_angle] = F_CalibrateFloor(averaged_frame, point_cloud,'',camera);
     % precalculate constants
-    disp_col = F_ConvDisplay(averaged_frame,frame_rgb,21,averaged_frame);
-
-    mag = max(size(disp_col,[1 2])./size(averaged_frame)); 
+    mag = max(size(zeros(1024,848),[1 2])./size(averaged_frame)); 
     camera.Start();
-    [floor_compare, floor_mask,floor_cutoff] = F_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
-    floor_variation = sum(floor_mask,"all")/2;
-    nofloor = sum(floor_mask)<50;
-
-    
+    [floor_compare, floor_mask,floor_cutoff, nofloor,floor_variation] = F_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
     %   Main Loop
     while(~stop)
-        [frame_depth, frame_rgb] = camera.GetFrame();
-        frame_depth(frame_depth > max_range) = 0;
-        frame_PtCloud = camera.GeneratePointCloud(frame_depth);
+        [frame_depth, frame_rgb,frame_PtCloud] = camera.LoadData();
         mask_fg = detector.Update(frame_depth,frame_rgb,frame_PtCloud,floor_cutoff);
         heights = F_DetectMeasure(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
         [visual_display, frame_diff] = F_OverlayText(heights, mag,mask_fg,frame_rgb,21,frame_depth);
-        video_player(visual_display);
-        depth_video_player(mask_fg);
-        rgb_video_player(frame_diff);
         floor_delta = sum(abs(floor_compare - frame_depth .* uint16(floor_mask))>80,"all");
-
         if(floor_delta > floor_variation | nofloor)
             disp("need to recalibrate floor")
             [cam_height, cam_angle] = F_CalibrateFloor(int32(frame_depth), frame_PtCloud,'',camera);
-            [floor_compare, floor_mask,floor_cutoff] = F_map_floor_mask(cam_height,cam_angle,camera,int32(frame_depth));
-            floor_variation = sum(floor_mask,"all")/2;
-            disp([cam_height, cam_angle]);
-            subplot(1,2,1);
-            imshow(floor_mask)
-            subplot(1,2,2);
-            imshow(floor_compare)
-            nofloor = (sum(floor_mask)<50|any(isnan([cam_height, cam_angle])));
+            [floor_compare, floor_mask,floor_cutoff,nofloor,floor_variation] ...
+                = F_map_floor_mask(cam_height,cam_angle,camera,int32(frame_depth));
         end
+        video_player(visual_display);
+        depth_video_player(mask_fg);
+        rgb_video_player(frame_diff);
     end
 catch e
     camera.Stop();
     rethrow(e)	
 end
 camera.Stop()
+
+
+
 function createFigureWithButton()
     % Create a figure
     fig = uifigure('Position', [100, 100, 400, 200], 'Name', 'Controls');
@@ -104,7 +94,7 @@ function createFigureWithButton()
     % Function to update the label text when the slider changes
     function updateLabel(slider, label)
         label.Text = sprintf('Value: %.2f', slider.Value);
-        max_range = slider.Value*Meters;
+        camera.max_range = slider.Value*Meters;
     end
 end
 function cleanMeUp()

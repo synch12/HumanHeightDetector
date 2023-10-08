@@ -26,6 +26,7 @@ classdef M_Camera < handle
         StartMethod;
         Intrinsics;
         pcMethod;
+        max_range
     end
     
     methods
@@ -45,6 +46,7 @@ classdef M_Camera < handle
             obj.StartMethod = START;
             obj.Intrinsics = cameraIntrinsics([obj.fx, obj.fy],[DIM_X/2,DIM_Y/2],[DIM_X,DIM_Y]);
             obj.pcMethod = PCMETHOD;
+            obj.max_range = 10 * 1000;
         end
 
         function obj = UpdatePixelAngles(obj)
@@ -70,6 +72,10 @@ classdef M_Camera < handle
             obj.StartMethod(obj);
         end
         function PointCloud = GeneratePointCloud(obj,RangeFrame)
+            PointCloud = obj.pcMethod(obj,RangeFrame);
+        end
+        function [RangeFrame, ColourFrame,PointCloud] = LoadData(obj)
+            [RangeFrame, ColourFrame] = obj.GetFrame();
             PointCloud = obj.pcMethod(obj,RangeFrame);
         end
     end

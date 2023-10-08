@@ -59,11 +59,14 @@ end
 function [RangeFrame, ColourFrame] = getFrame_Kinect(obj)
         RangeFrame = getsnapshot(obj.depthSource);
         ColourFrame = getsnapshot(obj.colourSource);
+        RangeFrame(RangeFrame > obj.max_range) = 0;
         flushdata(obj.depthSource);
 	    flushdata(obj.colourSource);
+        
 end
 
 function PointCloud = GetPointCloud_Kinect(obj,RangeFrame)
         frame_depth_abs = uint16(RangeFrame);
         PointCloud = pcfromkinect(obj.depthSource, frame_depth_abs);
 end
+

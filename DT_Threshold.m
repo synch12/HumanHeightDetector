@@ -1,7 +1,7 @@
 function Threshold = DT_Threshold()
 %DT_Threshold Distance Threshold foreground detector
 %   Detects all pixels that are within a certain distance from the camera
-Threshold = DetectionModule(@Init_Threshold, @Update_Threshold,@Train_Threshold);
+Threshold = M_Detector(@Init_Threshold, @Update_Threshold,@Train_Threshold);
 end
 
 function obj = Init_Threshold(obj,Camera, params)
@@ -14,17 +14,14 @@ function obj = Init_Threshold(obj,Camera, params)
     obj.horizontal_cutoff
 end
 
-function [RangeFrame, ColourFrame, Mask, PointCloud] = Update_Threshold(obj)
-    [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
-
+function Mask = Update_Threshold(obj,RangeFrame, ~, ~,floor_cutoff)
     Mask = (RangeFrame < obj.range_max) & (RangeFrame > obj.range_min);
     Mask(:,1:obj.horizontal_cutoff) = 0;
     Mask(:,obj.camera.dim_x-obj.horizontal_cutoff:obj.camera.dim_x) = 0;
+    Mask = Mask & ((RangeFrame<floor_cutoff));
     
 end
 
-function [RangeFrame, ColourFrame, Mask, PointCloud] = Train_Threshold(obj)
-    [RangeFrame, ColourFrame, PointCloud] = obj.camera.getFrame();
-    Mask = obj.detector(uint8(bitshift(RangeFrame,-8)));
-    
+function Mask = Train_Threshold(obj,RangeFrame, ~, ~)
+    Mask = RangeFrame<obj.range_max;
 end

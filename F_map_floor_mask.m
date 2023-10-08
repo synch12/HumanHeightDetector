@@ -1,4 +1,4 @@
-function [floor_compare, floor_mask, floor_cutoff] = F_map_floor_mask(height,angle,camera,reference_frame)
+function [floor_compare, floor_mask, floor_cutoff,nofloor,floor_variation] = F_map_floor_mask(height,angle,camera,reference_frame)
 %F_MAP_FLOOR_MASK Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -20,5 +20,7 @@ diff = abs(reference_frame - floor_plane);
 floor_mask = diff < 100;
 floor_cutoff = cutoff_map;
 floor_compare = uint16(floor_plane .*  int32(floor_mask));
+nofloor = sum(floor_mask)<50|any(isnan([height, angle]));
+floor_variation = sum(floor_mask,"all")/2;
 %imshow(floor_plane);
 %floor_cutoff = reference_frame <= cutoff_map;
