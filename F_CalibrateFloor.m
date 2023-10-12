@@ -1,10 +1,11 @@
 %% Function to measure the floor provided a frame and its point cloud
 %If it returns NaN that means the method input is likely wrong
-function [camera_height,elevation_angle] = floorDetectMeasure(frame,framePtCloud,method)
+function [camera_height,elevation_angle] = F_CalibrateFloor(frame,framePtCloud,method,camera)
 
 if(exist('method', 'var') == 0)
 	method = 'Area';
 end
+method = 'Area'
 %%
 filt_gen = strel('disk', 4);
 [dim_y,dim_x] = size(frame);
@@ -51,15 +52,16 @@ levels = imopen(frames_bin(:,:),filt_gen);
 levels = bwlabel(levels(:,:));
 
 Floor = zeros(size(frame));
-
+disp("Using Method")
 %% Group Area
 %This is the default method, it just selects the group based off of how
 %many pixels are in it, basic, but works
 if(strcmp(method,'Area'))
-	lrgst_area = 0;	
+	disp("Area Method")
+    lrgst_area = 0;	
 	num_groups = max(levels(:,:),[],'all');
 	for grp = 1:num_groups
-		level = zeros(424,512);
+		level = zeros(camera.dim_y,camera.dim_x);
 		level(levels(:,:)==grp) = 1;
 		area = sum(level,'all');
 		if(area>lrgst_area)
@@ -68,7 +70,7 @@ if(strcmp(method,'Area'))
 		end
 	end
 	
-	
+	disp(sum(Floor,"all"))
 	%% reclose group
 	Floor(:,:) = imclose(Floor(:,:),strel('disk', 2));
 	
@@ -81,10 +83,10 @@ elseif(strcmp(method,'Gradient'))
 	%% group gradients
 	stpest_grad = 0;
 	border_allowance = 3;
-	
+	disp("Gradient Method")	
 	num_groups = max(levels(:,:),[],'all');
 	for grp = 1:num_groups
-		level = zeros(424,512);
+		level = zeros(dim_y,dim_x);
 		level(levels(:,:)==grp) = 1;
 		vert = sum(level);
 		[vert_max,vert_inc] = max(vert);
@@ -112,6 +114,7 @@ end
 %Currently using largest group, could also use the steepest, though could
 %cause issues, combination of both could be best.
 floor_bin = Floor>0;
+disp(sum(floor_bin,"all"))
 floor_bin = imopen(floor_bin,strel('disk', 8));
 
 %% convert point cloud to usable XYZ
@@ -135,7 +138,7 @@ end
 %the median, but then the calculation for loops would have to run twice.
 
 column_tots = sum(floor_bin,1);
-
+%disp(floor_bin);
 %number of pixels to select from edge at the minimum, it will aim for a
 %quarter from the edges though
 dis_from_edge = 10;
@@ -166,7 +169,9 @@ for col = 1:1:dim_x
 		
 		theta_e = atan(y2/z2) - asin(H/(sqrt(y2^2+z2^2)));
 		measured_angles(col) = theta_e;
-	else
+    else
+        %disp("no height measured");
+        %disp(column_tots(col));
 		measured_heights(col) = NaN;
 		measured_angles(col) = NaN;
 	end

@@ -1,8 +1,8 @@
-function [colour_out, depth_out] = F_ConvDisplay(frame_depth, frame_colour, mag_fact, det_frame)	
+function [colour_out, depth_out] = F_AnnotateFrame(heights,mag,frame_depth, frame_colour, mag_fact, det_frame)	
 %this is for resizing the depth and colour images and superimposing them
 %not for adding text
-if(exist('det_frame', 'var') == 0)
-	det_frame = zeros(size(frame_depth));
+if(isempty(det_frame))
+	det_frame = uint16(zeros(size(frame_depth)));
 end
 
 %% the aspect ratios of the different cameras
@@ -38,6 +38,9 @@ d = round(b/2);
 colour_out = uint8(zeros(xRanD,yRanD,3));
 
 
+% col = imresize(gpuArray(frame_colour),[xRanC yRanC]);
+% dis = imresize(gpuArray(det_frame),[xRanD yRanD]);
+
 col = imresize(frame_colour,[xRanC yRanC]);
 dis = imresize(det_frame,[xRanD yRanD]);
 %copy over a image res x3 of all three values, to make a greyscale RGB image
@@ -68,6 +71,23 @@ dis_temp = (((depth_col+min_dist)./max_dist)-diff_dist);
 dis_temp = dis_temp + double(det_frame);
 depth_out = imresize(dis_temp,[xRanD yRanD]);
 
-
-
+if(~isempty(heights))
+		    for per = 1:1:size(heights,1)
+			    text = sprintf('%0.2f',round(heights(per,1),2));
+			    x = heights(per,2)*mag;
+			    y = heights(per,3)*mag - 20*mag;
+                x_RGB = heights(per,2)*mag;
+			    y_RGB = heights(per,3)*mag - 20*mag;
+			    %Cap the y value to >1
+			    if(y <= 0)
+				    y = 1;
+			    end
+			    colour_out  = insertText(colour_out,[x_RGB,y_RGB],text,...
+				    'FontSize',24,'BoxOpacity',0.5,'BoxColor','black','TextColor','red');
+			    depth_out  = insertText(depth_out,[x,y],text,...
+				    'FontSize',24,'BoxOpacity',0,'TextColor','white');
+                depth_out = depth_out(:, :, 1);
+		    end
+end
+end
 

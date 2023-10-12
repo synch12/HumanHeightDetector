@@ -1,37 +1,8 @@
 %%Function intended to be used with the final version of the Height
 %%detector function. It returns the the heights of everything it detects,
 %%also passes back the binary frame of stuff it detected. 
+function [heights,detFrame] = F_HeightMeasure(frame, framePtCloud,camElevationAngle,camHeight)
 
-%function [heights,depthFrame] = F_Measure(frame,mask,framePtCloud,camElevationAngle,camHeight)
-
-
-%Test inputs
-frame = ;
-mask = ;
-framePtCloud = ;
-camElevationAngle = ;
-camHeight = ;
-
-%
-
-[dim_y,dim_x] = size(frame);
-depthFrame = int32(zeros(dim_y,dim_x));
-
-
-%% get the difference from average
-%load in the original unedited frame
-diff = abs(frame-mask);
-
-diff_bw = diff > 100;
-diff_bw = bwareaopen(diff_bw,50);
-
-frame_diff = frame.*int32(diff_bw);
-
-%% Isolate the people-sized objects
-
-frame_min = imerode(frame,strel('disk', 1));
-%Edge is used to eliminate mixed pixel effect, may not be neeeded for kinect, does still seem to help a bit
-edge_bw = ((frame-frame_min)./frame);
 
 alpha = frame_diff & not(edge_bw);
 alpha = bwareaopen(alpha,50);
@@ -75,7 +46,7 @@ for grp = 1:num_groups
 	%if the real area is big enough, then calculate height of 'person'
 	if(real_area(grp)>10000)
 		[y_indA,~] = find(person_dist);
-		depthFrame = depthFrame + person_dist;
+		detFrame = detFrame + person_dist;
 		loc_y = min(y_indA);
 		[~, x_indB] = find(person_dist(loc_y,:));
 		
@@ -116,3 +87,8 @@ end
 %Trim off all rows that have one or more NaN value. 
 heights = rmmissing(heights);
 heights = rmmissing(heights);
+
+
+
+
+

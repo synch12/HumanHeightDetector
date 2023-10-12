@@ -1,30 +1,8 @@
-%%Function intended to be used with the final version of the Height
-%%detector function. It returns the the heights of everything it detects,
-%%also passes back the binary frame of stuff it detected. 
-function [heights,depthFrame] = F_DetectMeasure(frame,mask,framePtCloud,camElevationAngle,camHeight)
-
+ function [heights,depthFrame] = F_MeasureHeights(alpha,frame_diff,frame,framePtCloud,camElevationAngle,camHeight)
+%F_MEASUREHEIGHTS Summary of this function goes here
+%   Detailed explanation goes here
 [dim_y,dim_x] = size(frame);
 depthFrame = int32(zeros(dim_y,dim_x));
-
-
-%% get the difference from average
-%load in the original unedited frame
-diff = abs(frame-mask);
-
-diff_bw = diff > 100;
-diff_bw = bwareaopen(diff_bw,50);
-
-frame_diff = frame.*int32(diff_bw);
-
-%% Isolate the people-sized objects
-
-frame_min = imerode(frame,strel('disk', 1));
-%Edge is used to eliminate mixed pixel effect, may not be neeeded for kinect, does still seem to help a bit
-edge_bw = ((frame-frame_min)./frame);
-
-alpha = frame_diff & not(edge_bw);
-alpha = bwareaopen(alpha,50);
-
 groups = bwlabel(alpha);
 
 num_groups = max(groups(:));
@@ -47,7 +25,7 @@ for grp = 1:num_groups
 	
 	%Extract the 'person' from the current image using the mask found from
 	%the difference image
-	person_dist = frame_diff.*int32(person_mask);
+	person_dist = int32(frame_diff).*int32(person_mask);
 	
 	%Check it actually has values in it
 	if not(isempty(person))
@@ -73,15 +51,12 @@ for grp = 1:num_groups
 		p3 = select(framePtCloud,loc_y,dim_x-loc_x).Location;
 		y3 = p3(2);
 		z3 = p3(3);
-		
 		camToPersonDist = (sqrt(y3^2+z3^2));
-		
 		heightAngleDeviation = atan(y3/z3)*-1;
 		totalAngleDeviation = (sin(camElevationAngle+heightAngleDeviation));
 		heightFromCamLevel = camToPersonDist*totalAngleDeviation;
-		
 		heights(grp,1) = heightFromCamLevel + camHeight;
-		
+        heights(grp,1)
 		%For debugging, prints the heights and angles of each detected person
 		% 						disp("grp: " + grp + " ,  height: " +  height(grp) + " p: " + p + " ,  L: " + L + " ,  thetaT: "...
 		% 			+ rad2deg(theta_t) + " thetaP:  " + rad2deg(theta_d) + " ,  y3: " + y3 + " ,  z3: " + z3)
@@ -103,5 +78,6 @@ for grp = 1:num_groups
 end
 
 %Trim off all rows that have one or more NaN value. 
-heights = rmmissing(heights);
-heights = rmmissing(heights);
+nanRows = any(isnan(heights), 2);
+heights(nanRows,:) = [];
+

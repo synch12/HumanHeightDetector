@@ -1,8 +1,8 @@
-function CS_out = CS_KinectV2()
+function C_out = C_KinectV2()
 %CAMSETTINGS_KINECT Summary of this function goes here
 %   Detailed explanation goes here
 
-CS_out = CameraSettings(70.6,60,512,424, @Init_Kinect, @getFrame_Kinect);
+C_out = M_Camera(70.6,60,512,424, @Init_Kinect, @getFrame_Kinect);
 end
 
 function [camera_depth,camera_BGR] = Init_Kinect()
