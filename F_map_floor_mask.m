@@ -1,4 +1,4 @@
-function [floor_compare, floor_mask, floor_cutoff,nofloor,floor_variation] = F_map_floor_mask(height,angle,camera,reference_frame)
+function [floor_cutoff, floor_params] = F_map_floor_mask(height,angle,camera,reference_frame)
 %F_MAP_FLOOR_MASK Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,18 +9,19 @@ angle_vector = step_vector * pixel_delta + abs(angle);
 angle_vector(angle_vector < 0) = 0;
 cutoff_vector = ((height-0.35)*1000)./sin(angle_vector);
 floor_vector = ((height)*1000)./sin(angle_vector);
-
+floor_params = {};
 
 floor_plane = int32(abs(floor_vector * ones(1,camera.dim_x)));
 
 cutoff_map = int32(abs(cutoff_vector * ones(1,camera.dim_x)));
-size(reference_frame);
-size(floor_plane)
+% size(reference_frame);
+% size(floor_plane);
 diff = abs(reference_frame - floor_plane);
-floor_mask = diff < 100;
+floor_params{Floor.Mask} = diff < 100;
 floor_cutoff = cutoff_map;
-floor_compare = uint16(floor_plane .*  int32(floor_mask));
-nofloor = sum(floor_mask)<50|any(isnan([height, angle]));
-floor_variation = sum(floor_mask,"all")/2;
+floor_params{Floor.Compare} = uint16(floor_plane .*  int32(floor_params{Floor.Mask}));
+floor_params{Floor.NoFloor} = sum(floor_params{Floor.Mask},"all")<50|any(isnan([height, angle]));
+floor_params{Floor.Variation} = sum(floor_params{Floor.Mask},"all")/2;
+
 %imshow(floor_plane);
 %floor_cutoff = reference_frame <= cutoff_map;

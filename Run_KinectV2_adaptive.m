@@ -1,1 +1,1 @@
-main('v2','abl', 30,[8,100,200])
+main(C_KinectV2_Snapshot(),DT_Adaptive_background_learning(), 30,[8,100,200])

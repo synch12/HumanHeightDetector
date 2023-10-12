@@ -44,7 +44,7 @@ classdef M_Camera < handle
             obj.FrameMethod = GETFRAME;
             obj.StopMethod = STOP;
             obj.StartMethod = START;
-            obj.Intrinsics = cameraIntrinsics([obj.fx, obj.fy],[DIM_X/2,DIM_Y/2],[DIM_X,DIM_Y]);
+            obj.Intrinsics = cameraIntrinsics([obj.fx, obj.fy],[((DIM_X/2) + 5),((DIM_Y/2) -1)],[DIM_X,DIM_Y]);
             obj.pcMethod = PCMETHOD;
             obj.max_range = 10 * 1000;
         end

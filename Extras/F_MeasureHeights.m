@@ -1,4 +1,4 @@
-function [heights,depthFrame] = F_MeasureHeights(alpha,frame_diff,frame,framePtCloud,camElevationAngle,camHeight)
+ function [heights,depthFrame] = F_MeasureHeights(alpha,frame_diff,frame,framePtCloud,camElevationAngle,camHeight)
 %F_MEASUREHEIGHTS Summary of this function goes here
 %   Detailed explanation goes here
 [dim_y,dim_x] = size(frame);

@@ -1,4 +1,4 @@
-function [colour_out, depth_out] = F_ConvDisplay(heights,mag,frame_depth, frame_colour, mag_fact, det_frame)	
+function [colour_out, depth_out] = F_AnnotateFrame(heights,mag,frame_depth, frame_colour, mag_fact, det_frame)	
 %this is for resizing the depth and colour images and superimposing them
 %not for adding text
 if(isempty(det_frame))

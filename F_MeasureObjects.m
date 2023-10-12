@@ -1,4 +1,4 @@
-function [heights,depthFrame] = F_DetectMeasure(frame,mask,framePtCloud,camElevationAngle,camHeight)
+function [heights,depthFrame] = F_MeasureObjects(frame,mask,framePtCloud,camElevationAngle,camHeight)
 
 if(isempty(camHeight))
 	camHeight = 0;
@@ -72,8 +72,9 @@ for grp = 1:num_groups
 		[~, x_indB] = find(person_dist(loc_y,:));
 		
 		loc_x = round(median(x_indB));
-		
-		p3 = select(framePtCloud,loc_y,dim_x-loc_x).Location;
+		pos = dim_x-loc_x+1;
+        assignin("base","pos",pos);
+		p3 = select(framePtCloud,loc_y,pos).Location;
 		y3 = p3(2);
 		z3 = p3(3);
 		

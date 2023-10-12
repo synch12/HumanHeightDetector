@@ -1,7 +1,8 @@
 function [done] = main(CamSettings, DetectionMethod,training_frames, parameters)
 %% Created 18/03/23 By Malachi Wihongi
 %   Initialise camera and detector
-[camera,detector] = F_ParseParameters(CamSettings, DetectionMethod);
+camera = CamSettings;
+detector = DetectionMethod;
 training_frames = double(training_frames); 
 camera.Init();
 detector.Init(camera, parameters);
@@ -14,38 +15,40 @@ stop = false;
 max_range = 10*Meters;
 cleanupObj = onCleanup(@cleanMeUp);
 createFigureWithButton()
-
+FloorChanged = false;
 
 try
     [frame_rgb, averaged_frame, point_cloud] = F_TrainBackgroundModel(camera, detector, training_frames);
-    [cam_height, cam_angle] = F_CalibrateFloor(averaged_frame, point_cloud,'',camera);
-    % precalculate constants
     mag = max(size(zeros(1024,848),[1 2])./size(averaged_frame)); 
     camera.Start();
-    [floor_compare, floor_mask,floor_cutoff, nofloor,floor_variation] = F_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
-    %   Main Loop
+
     while(~stop)
-        [frame_depth, frame_rgb,frame_PtCloud] = camera.LoadData();
-        mask_fg = detector.Update(frame_depth,frame_rgb,frame_PtCloud,floor_cutoff);
-        heights = F_DetectMeasure(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
-        [visual_display, frame_diff] = F_OverlayText(heights, mag,mask_fg,frame_rgb,21,frame_depth);
-        floor_delta = sum(abs(floor_compare - frame_depth .* uint16(floor_mask))>80,"all");
-        if(floor_delta > floor_variation | nofloor)
-            disp("need to recalibrate floor")
-            [cam_height, cam_angle] = F_CalibrateFloor(int32(frame_depth), frame_PtCloud,'',camera);
-            [floor_compare, floor_mask,floor_cutoff,nofloor,floor_variation] ...
-                = F_map_floor_mask(cam_height,cam_angle,camera,int32(frame_depth));
+        [cam_height, cam_angle] = F_CalibrateFloor(averaged_frame, point_cloud,'',camera);
+        [floor_cutoff, floor_params] = F_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
+        FloorChanged = false;
+        while(~stop & ~FloorChanged)
+            [frame_depth, frame_rgb,frame_PtCloud] = camera.LoadData();
+    
+    
+            mask_fg = detector.Update(frame_depth,frame_rgb,frame_PtCloud,floor_cutoff);
+    
+    
+            heights = F_MeasureObjects(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
+    
+    
+            [visual_display, frame_diff] = F_AnnotateFrame(heights, mag,mask_fg,frame_rgb,21,frame_depth);
+    
+            video_player(visual_display);
+            rgb_video_player(frame_diff);
+    
+            FloorChanged = F_EvaluateFloor(floor_params,frame_depth);
         end
-        video_player(visual_display);
-        depth_video_player(mask_fg);
-        rgb_video_player(frame_diff);
     end
 catch e
     camera.Stop();
     rethrow(e)	
 end
 camera.Stop()
-
 
 
 function createFigureWithButton()
@@ -100,7 +103,6 @@ end
 function cleanMeUp()
     camera.Stop();
 end
-
 end
 
 

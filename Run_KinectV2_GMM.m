@@ -1,1 +1,1 @@
-main( 'v2','GMM',30,0 )
+main( C_KinectV2_Snapshot,DT_GMM(),30,0 )
