@@ -1,4 +1,4 @@
-function ABL = DT_Adaptive_background_learning()
+function ABL = DT_Adaptive()
 %DT_Adaptive_background_learning Gaussian Mixture Model foreground detector
 %   Makes use of vision.ForegroundDetector from Computer Vision Toolbox
 ABL = M_Detector(@Init_ABL, @Update_ABL,@Train_ABL);
