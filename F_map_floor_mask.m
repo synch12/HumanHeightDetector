@@ -17,11 +17,11 @@ cutoff_map = int32(abs(cutoff_vector * ones(1,camera.dim_x)));
 % size(reference_frame);
 % size(floor_plane);
 diff = abs(reference_frame - floor_plane);
-floor_params{Floor.Mask} = diff < 100;
+floor_params{Floor.Mask} = diff < 500;
 floor_cutoff = cutoff_map;
-floor_params{Floor.Compare} = uint16(floor_plane .*  int32(floor_params{Floor.Mask}));
+floor_params{Floor.Compare} = uint16(reference_frame .*  int32(floor_params{Floor.Mask}));
 floor_params{Floor.NoFloor} = sum(floor_params{Floor.Mask},"all")<50|any(isnan([height, angle]));
 floor_params{Floor.Variation} = sum(floor_params{Floor.Mask},"all")/2;
-
-%imshow(floor_plane);
+figure(2);
+imshow(floor_params{Floor.Compare});
 %floor_cutoff = reference_frame <= cutoff_map;

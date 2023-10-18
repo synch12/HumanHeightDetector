@@ -4,7 +4,9 @@ function [recalibrate] = F_EvaluateFloor(floor_params,frame_depth)
 
 frame_depth(~floor_params{Floor.Mask}) = 0;
 
-floor_delta = sum(abs(floor_params{Floor.Compare} - frame_depth)>80,"all");
+floor_delta = sum(abs(floor_params{Floor.Compare} - frame_depth)>100,"all");
 recalibrate = floor_delta > floor_params{Floor.Variation} | floor_params{Floor.NoFloor};
+%figure(3);
+%imshow(floor_delta);
 end
 

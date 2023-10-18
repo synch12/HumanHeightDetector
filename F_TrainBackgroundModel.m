@@ -15,7 +15,7 @@ end
 camera.Stop();
 averaged_frame = int32(median(Averaging_Frames,3));
 backgroundPtGen = uint16(averaged_frame);
-PointCloud = pcfromdepth(backgroundPtGen,1000,camera.Intrinsics);
+PointCloud = camera.GeneratePointCloud(backgroundPtGen);
 assignin('base',"pc",PointCloud);
 assignin('base',"bg",backgroundPtGen);
 assignin('base',"af",averaged_frame);

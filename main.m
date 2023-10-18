@@ -23,24 +23,17 @@ try
     camera.Start();
 
     while(~stop)
+        disp("Calibrating Floor")
         [cam_height, cam_angle] = F_CalibrateFloor(averaged_frame, point_cloud,'',camera);
         [floor_cutoff, floor_params] = F_map_floor_mask(cam_height,cam_angle,camera,averaged_frame);
         FloorChanged = false;
         while(~stop & ~FloorChanged)
             [frame_depth, frame_rgb,frame_PtCloud] = camera.LoadData();
-    
-    
             mask_fg = detector.Update(frame_depth,frame_rgb,frame_PtCloud,floor_cutoff);
-    
-    
             heights = F_MeasureObjects(int32(frame_depth),int32(mask_fg),frame_PtCloud, cam_angle,cam_height);
-    
-    
             [visual_display, frame_diff] = F_AnnotateFrame(heights, mag,mask_fg,frame_rgb,21,frame_depth);
-    
             video_player(visual_display);
             rgb_video_player(frame_diff);
-    
             FloorChanged = F_EvaluateFloor(floor_params,frame_depth);
         end
     end
@@ -53,7 +46,7 @@ camera.Stop()
 
 function createFigureWithButton()
     % Create a figure
-    fig = uifigure('Position', [100, 100, 400, 200], 'Name', 'Controls');
+    fig = figure('Position', [100, 100, 400, 200], 'Name', 'Controls');
     
     % Create a panel for grouping UI elements
     p = uipanel(fig, 'Position', [0.1 0.1 0.8 0.8]);
@@ -67,14 +60,14 @@ function createFigureWithButton()
         'Position', [150, 30, 100, 40], 'Callback', @resetFloorsCallback);
     
     % Create a slider
-    slider = uislider(fig, 'Position', [50, 150, 300, 3]);
+    %slider = uislider(fig, 'Position', [50, 150, 300, 3]);
     minVal = 0; % Minimum value
     maxVal = 15; % Maximum value
-    slider.Limits = [minVal, maxVal];
+    %slider.Limits = [minVal, maxVal];
 
     % Create a label to display the slider value
-    label = uilabel(fig, 'Position', [50, 120, 300, 22]);
-    label.Text = sprintf('Value: %.2f', slider.Value);
+    %label = uilabel(fig, 'Position', [50, 120, 300, 22]);
+    %label.Text = sprintf('Value: %.2f', slider.Value);
     
     % Define a callback function for the "Stop" button
     function buttonCallback(~, ~)
