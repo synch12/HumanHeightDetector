@@ -6,16 +6,14 @@ detector = DetectionMethod;
 training_frames = double(training_frames); 
 camera.Init();
 detector.Init(camera, parameters);
-Meters = 1000;
 %   Initialise video players
 video_player = vision.VideoPlayer();
-depth_video_player = vision.VideoPlayer();
 rgb_video_player = vision.VideoPlayer("Name","Colour Feed");
 stop = false;
-max_range = 10*Meters;
 cleanupObj = onCleanup(@cleanMeUp);
 createFigureWithButton()
 FloorChanged = false;
+Check_Floor =  true;
 
 try
     [frame_rgb, averaged_frame, point_cloud] = F_TrainBackgroundModel(camera, detector, training_frames);
@@ -34,7 +32,9 @@ try
             [visual_display, frame_diff] = F_AnnotateFrame(heights, mag,mask_fg,frame_rgb,21,frame_depth);
             video_player(visual_display);
             rgb_video_player(frame_diff);
-            FloorChanged = F_EvaluateFloor(floor_params,frame_depth);
+            if(Check_Floor)
+                FloorChanged = F_EvaluateFloor(floor_params,frame_depth);
+            end
         end
     end
 catch e
@@ -51,25 +51,19 @@ function createFigureWithButton()
     % Create a panel for grouping UI elements
     p = uipanel(fig, 'Position', [0.1 0.1 0.8 0.8]);
     
-    % Create a button
+    % Create the buttons for the UI panel
     btn = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Stop', ...
-        'Position', [150, 80, 100, 40], 'Callback', @buttonCallback);
+        'Position', [100, 30, 200, 40], 'Callback', @buttonCallback);
     
-    % Create another button
-    btn2 = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Manual Floor Recalibrate', ...
-        'Position', [150, 30, 100, 40], 'Callback', @resetFloorsCallback);
-    
-    % Create a slider
-    %slider = uislider(fig, 'Position', [50, 150, 300, 3]);
-    minVal = 0; % Minimum value
-    maxVal = 15; % Maximum value
-    %slider.Limits = [minVal, maxVal];
+    btn3 = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Toggle Automatic Floor Recalibration', ...
+        'Position', [100, 80, 200, 40], 'Callback', @haltFloorsCallback);
 
-    % Create a label to display the slider value
-    %label = uilabel(fig, 'Position', [50, 120, 300, 22]);
-    %label.Text = sprintf('Value: %.2f', slider.Value);
+    % Create another button
+    btn2 = uicontrol(fig, 'Style', 'pushbutton', 'String', 'Manual Floor Recalibration', ...
+        'Position', [100, 130, 200, 40], 'Callback', @resetFloorsCallback);
     
-    % Define a callback function for the "Stop" button
+    
+    % A callback function for the "Stop" button
     function buttonCallback(~, ~)
         % This function is executed when the button is clicked
         stop = true;
@@ -77,21 +71,22 @@ function createFigureWithButton()
         delete(fig);
     end
     
-    % Define a callback function for the slider
-    slider.ValueChangedFcn = @(slider, event) updateLabel(slider, label);
     
-    % Define a callback function for the "Manual Floor Recalibrate" button
+    % A callback function for the "Manual Floor Recalibrate" button
     function resetFloorsCallback(~, ~)
-        % This function is executed when the button is clicked
-        nofloor = true;
+        FloorChanged = true;
         disp('Manual Floor Recalibrate Button Clicked!');
     end
-    
-    % Function to update the label text when the slider changes
-    function updateLabel(slider, label)
-        label.Text = sprintf('Value: %.2f', slider.Value);
-        camera.max_range = slider.Value*Meters;
+    % This function is executed when the "Toggle Automatic Floor Recalibration" button is clicked
+    function haltFloorsCallback(~, ~)
+        Check_Floor = ~Check_Floor;
+        if(Check_Floor == true)
+            disp('Automatic Floor Recalibration Enabled');
+        else
+            disp('Automatic Floor Recalibration Disabled');
+        end
     end
+
 end
 function cleanMeUp()
     camera.Stop();

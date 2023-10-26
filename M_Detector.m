@@ -1,5 +1,5 @@
 classdef M_Detector < handle
-    %DETECTIONMODULE The framework for detection methods.
+    % M_Detector The framework for detection methods.
     %   Detailed explanation goes here
     %   
     %   
